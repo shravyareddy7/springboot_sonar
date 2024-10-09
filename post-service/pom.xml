@@ -33,12 +33,12 @@
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<sonar.projectKey>shravyareddy_spring-boot-assignment-post-service</sonar.projectKey>
 		<sonar.exclusions>**/com/spring_boot_final_assginment/post_service/client/**,
-			**/com/springboot_final_assginment/post_service/repository/**,
-			**/com/springboot_final_assginment/post_service/utils/**,
-			**/com/springboot_final_assginment/post_service/dto/**,
-			**/com/springboot_final_assginment/post_service/entity/**,
-			**/com/springboot_final_assginment/post_service/exception/**,
-			**/com/springboot_final_assginment/post_service/PostServiceApplication.java,
+			**/com/springboot_final_assignment/post_service/repository/**,
+			**/com/springboot_final_assignment/post_service/utils/**,
+			**/com/springboot_final_assignment/post_service/dto/**,
+			**/com/springboot_final_assignment/post_service/entity/**,
+			**/com/springboot_final_assignment/post_service/exception/**,
+			**/com/springboot_final_assignment/post_service/PostServiceApplication.java,
 		</sonar.exclusions>
 	</properties>
 	<dependencies>
