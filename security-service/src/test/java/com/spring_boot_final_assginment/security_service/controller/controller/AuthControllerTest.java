@@ -15,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
@@ -73,6 +74,7 @@ public class AuthControllerTest {
     public void testGenerateToken_Success() {
         UserDTO userDTO = new UserDTO(1L, "user1", "password");
         Authentication authentication = mock(Authentication.class);
+
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authentication);
         when(authService.login(userDTO.getUsername(), userDTO.getPassword())).thenReturn("mockToken");
@@ -86,8 +88,9 @@ public class AuthControllerTest {
     @Test
     public void testGenerateToken_InvalidCredentials() {
         UserDTO userDTO = new UserDTO(1L, "user1", "password");
+
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenThrow(new InvalidUserException("Invalid User Credentials: Please check your username and password."));
+                .thenThrow(new InvalidUserException("Invalid User Credentials: Please check your username and password.") {});
 
         InvalidUserException exception = assertThrows(InvalidUserException.class, () ->
                 authController.generateToken(userDTO)
@@ -120,4 +123,20 @@ public class AuthControllerTest {
         assertEquals(Constant.INVALID_TOKEN_MESSAGE, exception.getMessage());
         verify(authService, times(1)).validateToken(token);
     }
+
+    @Test
+    public void testGenerateToken_InvalidUserExceptionThrown() {
+        UserDTO userDTO = new UserDTO(1L, "user1", "wrongPassword");
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new AuthenticationException("Invalid credentials") {});
+
+        InvalidUserException exception = assertThrows(InvalidUserException.class, () ->
+                authController.generateToken(userDTO)
+        );
+
+        assertEquals(Constant.INVALID_USER_CREDENTIALS, exception.getMessage());
+        verify(authService, never()).login(userDTO.getUsername(), userDTO.getPassword());
+    }
+
 }

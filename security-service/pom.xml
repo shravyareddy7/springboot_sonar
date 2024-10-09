@@ -34,7 +34,7 @@
 		<sonar.projectKey>shravyareddy_spring-boot-assignment-security-service</sonar.projectKey>
 		<sonar.exclusions>**/com/spring_boot_final_assginment/security_service/config/**,
 			**/com/spring_boot_final_assginment/security_service/repository/**,
-			**/com/spring_boot_final_assginment/security_service/util/**,
+			**/com/spring_boot_final_assginment/security_service/utils/**,
 			**/com/spring_boot_final_assginment/security_service/dto/**,
 			**/com/spring_boot_final_assginment/security_service/entity/**,
 			**/com/spring_boot_final_assginment/security_service/exception/**,

@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.*;
 
+import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -187,6 +188,59 @@ class PostServiceTest {
         assertEquals(comment2, result.get(1));
         verify(commentClient, times(1)).getCommentsByPostId(postId);
     }
+    @Test
+    public void testGetPostById_FailFeignException() {
+        int postId = 1;
+        Post post = new Post();
+        post.setId(postId);
+        Optional<Post> optionalPost = Optional.of(post);
 
+        when(repository.findById(postId)).thenReturn(optionalPost);
+        FeignException feignException = mock(FeignException.class);
+        when(feignException.status()).thenReturn(500);  // Simulate a non-404 error
+        when(commentClient.getCommentsByPostId(postId)).thenThrow(feignException);
+
+        FeignException thrownException = assertThrows(FeignException.class, () -> postService.getPostById(postId));
+
+        assertEquals(500, thrownException.status());
+        verify(commentClient, times(1)).getCommentsByPostId(postId);
+    }
+
+    @Test
+    public void testGetPostById_CommentClient404Exception() {
+        int postId = 1;
+        Post post = new Post();
+        post.setId(postId);
+        Optional<Post> optionalPost = Optional.of(post);
+
+        when(repository.findById(postId)).thenReturn(optionalPost);
+        FeignException feignException = mock(FeignException.class);
+        when(feignException.status()).thenReturn(404);  // Simulate a 404 error
+        when(commentClient.getCommentsByPostId(postId)).thenThrow(feignException);
+
+        Post result = postService.getPostById(postId);
+
+        assertNotNull(result);
+        assertEquals(postId, result.getId());
+        assertEquals(0, result.getComments().size()); // Comments should be empty
+        verify(commentClient, times(1)).getCommentsByPostId(postId);
+    }
+    @Test
+    public void testGetPostById_CommentClientNon404Exception() {
+        int postId = 1;
+        Post post = new Post();
+        post.setId(postId);
+        Optional<Post> optionalPost = Optional.of(post);
+
+        when(repository.findById(postId)).thenReturn(optionalPost);
+        FeignException feignException = mock(FeignException.class);
+        when(feignException.status()).thenReturn(500);  // Simulate a non-404 error
+        when(commentClient.getCommentsByPostId(postId)).thenThrow(feignException);
+
+        FeignException thrownException = assertThrows(FeignException.class, () -> postService.getPostById(postId));
+
+        assertEquals(500, thrownException.status());
+        verify(commentClient, times(1)).getCommentsByPostId(postId);
+    }
 
 }
