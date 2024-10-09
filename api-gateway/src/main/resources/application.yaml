@@ -1,0 +1,31 @@
+
+spring:
+  application:
+    name: api-gateway
+  config:
+    import: "optional:configserver:http://localhost:8088"
+  cloud:
+    gateway:
+      routes:
+        - id: post-service
+          uri: lb://post-service
+          predicates:
+            - Path=/posts/**
+          filters:
+            - AuthenticationFilter
+        - id: comment-service
+          uri: lb://comment-service
+          predicates:
+            - Path=/comments/**
+          filters:
+            - AuthenticationFilter
+        - id: security-service
+          uri: lb://security-service
+          predicates:
+            - Path=/auth/**
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
