@@ -72,16 +72,13 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post updatePost(int id, Post post) {
         Optional<Post> existingPost = repository.findById(id);
-        System.out.println(existingPost);
         if (existingPost.isPresent()) {
             Post updatedPost = existingPost.get();
             updatedPost.setPictureUrl(post.getPictureUrl());
             updatedPost.setCaption(post.getCaption());
             updatedPost.setLikes(post.getLikes());
             updatedPost.setShares(post.getShares());
-//            updatedPost.setId(id);
             repository.save(updatedPost);
-            System.out.println(updatedPost);
             return updatedPost;
         } else {
             throw new PostsNotFoundException(Constants.POST_NOT_FOUND + id);

@@ -52,7 +52,6 @@ public class PostController {
 
     @GetMapping("/posts/")
     public Boolean checkIfPostExists(int id) {
-        System.out.println("post controller");
         return service.existsById(id);
     }
 
