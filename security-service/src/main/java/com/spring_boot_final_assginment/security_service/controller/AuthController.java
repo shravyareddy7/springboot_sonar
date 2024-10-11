@@ -42,9 +42,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public String generateToken(@RequestBody UserDTO userDTO) {
-        System.out.println("login method");
         try {
-            System.out.println("try");
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(userDTO.getUsername(), userDTO.getPassword())
             );
@@ -56,7 +54,6 @@ public class AuthController {
 
     @PostMapping(Constant.VALIDATE)
     public String validateToken(@RequestParam("token") String token) {
-        System.out.println(0);
         try {
             authService.validateToken(token);
             return "Valid User Token";
