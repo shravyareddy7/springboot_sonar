@@ -1,7 +1,6 @@
 package com.springboot_final_assignment.comment_service.service;
 
 import com.springboot_final_assignment.comment_service.client.PostClient;
-import com.springboot_final_assignment.comment_service.dto.Post;
 import com.springboot_final_assignment.comment_service.entity.Comment;
 import com.springboot_final_assignment.comment_service.exception.CommentNotFoundException;
 import com.springboot_final_assignment.comment_service.exception.CommentsNotFoundException;
@@ -22,17 +21,19 @@ import java.util.Optional;
 @Transactional
 public class CommentServiceImpl implements CommentService{
 
-    @Autowired
     private CommentRepository commentRepository;
-    @Autowired
     private PostClient postClient;
 
-
+    @Autowired
+    public CommentServiceImpl(CommentRepository repository,PostClient client){
+        commentRepository=repository;
+        postClient=client;
+    }
 
     @Override
     public ResponseEntity<List<Comment>> getAllComments() {
         List<Comment> comments=commentRepository.findAll();
-        if(comments.size()==0)
+        if(comments.isEmpty())
             throw new CommentsNotFoundException(Constants.NO_COMMENTS);
         return new ResponseEntity<>(comments, HttpStatus.OK);
     }
@@ -43,16 +44,24 @@ public class CommentServiceImpl implements CommentService{
         if(comment.isPresent())
             return new ResponseEntity<>(comment.get(),HttpStatus.OK);
         else
-            throw new RuntimeException(Constants.COMMENT_NOT_FOUND+id);
+            throw new CommentNotFoundException(Constants.COMMENT_NOT_FOUND+id);
     }
 
     @Override
     public ResponseEntity<List<Comment>> getCommentsByPostId(int postId) {
-        List<Comment> comments = commentRepository.findByPostId(postId);
-        if (comments.isEmpty()) {
-            throw new CommentsNotFoundException(Constants.NO_COMMENTS_FOR_POST +postId);
-        } else {
-            return ResponseEntity.ok(comments);
+        try {
+            List<Comment> comments = commentRepository.findByPostId(postId);
+            if (postClient.checkIfPostExists(postId)) {
+                if (comments.isEmpty()) {
+                    throw new CommentsNotFoundException(Constants.NO_COMMENTS_FOR_POST + postId);
+                } else {
+                    return ResponseEntity.ok(comments);
+                }
+            } else {
+                throw new PostNotFoundException(Constants.POST_NOT_FOUND + postId);
+            }
+        } catch (FeignException.NotFound e) {
+            throw new PostNotFoundException(Constants.POST_NOT_FOUND + postId);
         }
     }
 
@@ -60,13 +69,14 @@ public class CommentServiceImpl implements CommentService{
     public ResponseEntity<Comment> createComment(Comment comment,int postId) {
         try {
             postClient.checkIfPostExists(postId);
+            System.out.println("post  exists");
         } catch (FeignException.NotFound e) {
-            throw new PostNotFoundException(Constants.POST_NOT_FOUND + comment.getPostId());
+            throw new PostNotFoundException(Constants.POST_NOT_FOUND + postId);
         }
 
         comment.setPostId(postId);
         commentRepository.save(comment);
-
+        System.out.println("saved comment");
         return new ResponseEntity<>(comment, HttpStatus.OK);
     }
 

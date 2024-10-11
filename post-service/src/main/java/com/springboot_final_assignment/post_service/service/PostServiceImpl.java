@@ -29,7 +29,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<Post> getAllPosts() {
         List<Post> posts = repository.findAll();
-        if(repository.findAll().size()==0)
+        if(repository.findAll().isEmpty())
             throw new PostNotFoundException(Constants.NO_POST_WITH_ID);
         for (Post post : posts) {
             try {
@@ -72,13 +72,17 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post updatePost(int id, Post post) {
         Optional<Post> existingPost = repository.findById(id);
+        System.out.println(existingPost);
         if (existingPost.isPresent()) {
             Post updatedPost = existingPost.get();
             updatedPost.setPictureUrl(post.getPictureUrl());
             updatedPost.setCaption(post.getCaption());
             updatedPost.setLikes(post.getLikes());
             updatedPost.setShares(post.getShares());
-            return repository.save(updatedPost);
+//            updatedPost.setId(id);
+            repository.save(updatedPost);
+            System.out.println(updatedPost);
+            return updatedPost;
         } else {
             throw new PostsNotFoundException(Constants.POST_NOT_FOUND + id);
         }
@@ -98,15 +102,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public Boolean existsById(int postId) {
         Optional<Post> optionalPost = repository.findById(postId);
-        if(optionalPost.isPresent()){
-            return true;
-        }
-        else
-            return false;
+        return optionalPost.isPresent();
     }
 
-    public List<Comment> getCommentsForPost(int postId) {
-        List<Comment> comments = commentClient.getCommentsByPostId(postId);
-        return comments;
-    }
 }

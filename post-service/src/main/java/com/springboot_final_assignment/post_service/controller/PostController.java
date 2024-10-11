@@ -33,23 +33,26 @@ public class PostController {
     }
 
     @PostMapping
-    public void createPost(@RequestBody Post post){
+    public String createPost(@RequestBody Post post){
         service.createPost(post);
+        return "Post saved";
     }
 
     @PutMapping(Constants.POST_ID_URL)
     public Post updatePost(@PathVariable int id, @RequestBody Post post){
-        service.updatePost(id,post);
-        return post;
+        Post updatedPost = service.updatePost(id, post);
+        return updatedPost;
     }
 
     @DeleteMapping(Constants.POST_ID_URL)
-    public void deletePost(@PathVariable int id){
+    public String deletePost(@PathVariable int id){
         service.deletePost(id);
+        return "Deleted post with id "+id;
     }
 
     @GetMapping("/posts/")
     public Boolean checkIfPostExists(int id) {
+        System.out.println("post controller");
         return service.existsById(id);
     }
 

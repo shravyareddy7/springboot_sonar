@@ -11,7 +11,6 @@ import feign.Request;
 import feign.RequestTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -25,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class CommentServiceImplTest {
+class CommentServiceImplTest {
 
     @InjectMocks
     private CommentServiceImpl commentService;
@@ -42,7 +41,7 @@ public class CommentServiceImplTest {
     }
 
     @Test
-    public void testGetAllComments() {
+     void testGetAllComments() {
         List<Comment> comments = new ArrayList<>();
         comments.add(new Comment(1, 1, "Great post!", "User1", 0, new ArrayList<>()));
 
@@ -56,7 +55,7 @@ public class CommentServiceImplTest {
     }
 
     @Test
-    public void testGetAllComments_NoComments() {
+     void testGetAllComments_NoComments() {
         when(commentRepository.findAll()).thenReturn(new ArrayList<>());
 
         assertThrows(CommentsNotFoundException.class, () -> {
@@ -65,7 +64,7 @@ public class CommentServiceImplTest {
     }
 
     @Test
-    public void testGetCommentById() {
+     void testGetCommentById() {
         Comment comment = new Comment(1, 1, "Great post!", "User1", 0, new ArrayList<>());
         when(commentRepository.findById(1)).thenReturn(Optional.of(comment));
 
@@ -76,7 +75,7 @@ public class CommentServiceImplTest {
     }
 
     @Test
-    public void testGetCommentById_NotFound() {
+     void testGetCommentById_NotFound() {
         when(commentRepository.findById(1)).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> {
@@ -84,30 +83,9 @@ public class CommentServiceImplTest {
         });
     }
 
-    @Test
-    public void testGetCommentsByPostId() {
-        List<Comment> comments = new ArrayList<>();
-        comments.add(new Comment(1, 1, "Great post!", "User1", 0, new ArrayList<>()));
-
-        when(commentRepository.findByPostId(1)).thenReturn(comments);
-
-        ResponseEntity<List<Comment>> response = commentService.getCommentsByPostId(1);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(1, response.getBody().size());
-    }
 
     @Test
-    public void testGetCommentsByPostId_NoComments() {
-        when(commentRepository.findByPostId(1)).thenReturn(new ArrayList<>());
-
-        assertThrows(CommentsNotFoundException.class, () -> {
-            commentService.getCommentsByPostId(1);
-        });
-    }
-
-    @Test
-    public void testCreateComment() {
+     void testCreateComment() {
         Comment comment = new Comment(0, 1, "Great post!", "User1", 0, new ArrayList<>());
   when(commentRepository.save(any(Comment.class))).thenReturn(comment);
 
@@ -118,7 +96,7 @@ public class CommentServiceImplTest {
     }
 
     @Test
-    public void testCreateComment_Success() {
+     void testCreateComment_Success() {
         Comment comment = new Comment(0, 1, "Great post!", "User1", 0, new ArrayList<>());
         when(commentRepository.save(comment)).thenReturn(comment);
 
@@ -130,7 +108,7 @@ public class CommentServiceImplTest {
 
 
     @Test
-    public void testUpdateComment() {
+     void testUpdateComment() {
         Comment existingComment = new Comment(1, 1, "Old comment", "User1", 0, new ArrayList<>());
         Comment updatedComment = new Comment(1, 1, "Updated comment", "User1", 0, new ArrayList<>());
 
@@ -144,7 +122,7 @@ public class CommentServiceImplTest {
     }
 
     @Test
-    public void testUpdateComment_NotFound() {
+     void testUpdateComment_NotFound() {
         Comment updatedComment = new Comment(1, 1, "Updated comment", "User1", 0, new ArrayList<>());
 
         when(commentRepository.findById(1)).thenReturn(Optional.empty());
@@ -155,7 +133,7 @@ public class CommentServiceImplTest {
     }
 
     @Test
-    public void testDeleteComment() {
+     void testDeleteComment() {
         Comment comment = new Comment(1, 1, "Great post!", "User1", 0, new ArrayList<>());
 
         when(commentRepository.findById(1)).thenReturn(Optional.of(comment));
@@ -167,7 +145,7 @@ public class CommentServiceImplTest {
     }
 
     @Test
-    public void testDeleteComment_NotFound() {
+     void testDeleteComment_NotFound() {
         when(commentRepository.findById(1)).thenReturn(Optional.empty());
 
         assertThrows(CommentNotFoundException.class, () -> {
@@ -176,7 +154,7 @@ public class CommentServiceImplTest {
     }
 
     @Test
-    public void testCreateComment_PostNotFound() {
+     void testCreateComment_PostNotFound() {
         Comment comment = new Comment(0, 1, "Great post!", "User1", 0, new ArrayList<>());
 
         Request request = Request.create(
@@ -200,7 +178,7 @@ public class CommentServiceImplTest {
     }
 
     @Test
-    public void testDeleteCommentsByPostId() {
+     void testDeleteCommentsByPostId() {
         int postId = 1;
 
         doNothing().when(commentRepository).deleteByPostId(postId);
@@ -212,6 +190,61 @@ public class CommentServiceImplTest {
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 
+    @Test
+    void testGetCommentsByPostId_PostExists_CommentsFound() {
+        int postId = 1;
+        List<Comment> comments = new ArrayList<>();
+        comments.add(new Comment(1, postId, "Great post!", "User1", 0, new ArrayList<>()));
 
+        when(postClient.checkIfPostExists(postId)).thenReturn(true);
+        when(commentRepository.findByPostId(postId)).thenReturn(comments);
 
+        ResponseEntity<List<Comment>> response = commentService.getCommentsByPostId(postId);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(1, response.getBody().size());
+    }
+    @Test
+    void testGetCommentsByPostId_PostExists_NoComments() {
+        int postId = 1;
+        when(postClient.checkIfPostExists(postId)).thenReturn(true);
+        when(commentRepository.findByPostId(postId)).thenReturn(new ArrayList<>());
+        assertThrows(CommentsNotFoundException.class, () -> {
+            commentService.getCommentsByPostId(postId);
+        });
+    }
+    @Test
+    void testGetCommentsByPostId_PostDoesNotExist() {
+        int postId = 1;
+        when(postClient.checkIfPostExists(postId)).thenReturn(false);
+        assertThrows(PostNotFoundException.class, () -> {
+            commentService.getCommentsByPostId(postId);
+        });
+    }
+
+@Test
+void testGetCommentsByPostId_PostCheckThrowsException() {
+    int postId = 1;
+
+    Request mockRequest = Request.create(
+            Request.HttpMethod.GET,
+            "http://localhost:8081/posts/" + postId,
+            Collections.emptyMap(),
+            null,
+            null,
+            null
+    );
+
+    FeignException.NotFound notFoundException = new FeignException.NotFound(
+            "Post not found",
+            mockRequest,
+            null,
+            null
+    );
+
+    when(postClient.checkIfPostExists(postId)).thenThrow(notFoundException);
+    assertThrows(PostNotFoundException.class, () -> {
+        commentService.getCommentsByPostId(postId);
+    });
+}
 }

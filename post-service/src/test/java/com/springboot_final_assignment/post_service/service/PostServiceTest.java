@@ -140,12 +140,17 @@ class PostServiceTest {
         verify(repository, times(1)).save(any(Post.class));
     }
 
+    private void updateNonExistentPost() {
+        postService.updatePost(1, new Post());
+    }
     @Test
     void testUpdatePostNotFound() {
         when(repository.findById(1)).thenReturn(Optional.empty());
 
-        assertThrows(PostsNotFoundException.class, () -> postService.updatePost(1, new Post()));
+        assertThrows(PostsNotFoundException.class, this::updateNonExistentPost);
     }
+
+
 
     @Test
     void testDeletePost() {
@@ -171,25 +176,9 @@ class PostServiceTest {
         assertTrue(postService.existsById(1));
         assertFalse(postService.existsById(2));
     }
+
     @Test
-    void testGetCommentsForPost() {
-        int postId = 1;
-        Comment comment1 = new Comment(1, postId, "Great post!", "User1", 10, new ArrayList<>());
-        Comment comment2 = new Comment(2, postId, "Nice work!", "User2", 5, new ArrayList<>(Arrays.asList("Thanks!")));
-
-        List<Comment> mockComments = Arrays.asList(comment1, comment2);
-
-        when(commentClient.getCommentsByPostId(postId)).thenReturn(mockComments);
-
-        List<Comment> result = postService.getCommentsForPost(postId);
-
-        assertEquals(2, result.size());
-        assertEquals(comment1, result.get(0));
-        assertEquals(comment2, result.get(1));
-        verify(commentClient, times(1)).getCommentsByPostId(postId);
-    }
-    @Test
-    public void testGetPostById_FailFeignException() {
+     void testGetPostById_FailFeignException() {
         int postId = 1;
         Post post = new Post();
         post.setId(postId);
@@ -207,7 +196,7 @@ class PostServiceTest {
     }
 
     @Test
-    public void testGetPostById_CommentClient404Exception() {
+     void testGetPostById_CommentClient404Exception() {
         int postId = 1;
         Post post = new Post();
         post.setId(postId);
@@ -226,7 +215,7 @@ class PostServiceTest {
         verify(commentClient, times(1)).getCommentsByPostId(postId);
     }
     @Test
-    public void testGetPostById_CommentClientNon404Exception() {
+     void testGetPostById_CommentClientNon404Exception() {
         int postId = 1;
         Post post = new Post();
         post.setId(postId);

@@ -31,10 +31,8 @@ public class AuthService {
     }
 
     public String login(String username, String password) {
-
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException(Constant.USER_NOT_FOUND));
-        System.out.println(user);
         if (passwordEncoder.matches(password, user.getPassword())) {
             return jwtService.generateToken(username);
         } else {
@@ -43,7 +41,6 @@ public class AuthService {
     }
 
     public void validateToken(String token){
-        System.out.println("2");
         jwtService.validateToken(token);
     }
 }

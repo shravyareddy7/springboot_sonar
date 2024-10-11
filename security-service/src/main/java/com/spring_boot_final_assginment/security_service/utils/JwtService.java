@@ -15,28 +15,20 @@ import java.util.Map;
 @Component
 public class JwtService {
 
-    public static String SECRET;
-
     @Value("${JWT_SECRET_KEY}")
-    public void setSecret(String secret) {
-        this.SECRET = secret;
-    }
+    public  String SECRET;
 
     public void validateToken(final String token) {
-        System.out.println(3);
         Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
     }
 
 
     public String generateToken(String userName) {
-        System.out.println("generate token");
         Map<String, Object> claims = new HashMap<>();
-        System.out.println("gen2");
         return createToken(claims, userName);
     }
 
     private String createToken(Map<String, Object> claims, String userName) {
-        System.out.println("create");
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userName)

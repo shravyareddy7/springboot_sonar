@@ -16,7 +16,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-public class CommentControllerTest {
+class CommentControllerTest {
 
     @InjectMocks
     private CommentController commentController;
@@ -30,7 +30,7 @@ public class CommentControllerTest {
     }
 
     @Test
-    public void testGetAllComments() {
+     void testGetAllComments() {
         List<Comment> comments = new ArrayList<>();
         comments.add(new Comment(1, 1, "Great post!", "User1", 0, new ArrayList<>()));
         comments.add(new Comment(2, 1, "Nice article!", "User2", 0, new ArrayList<>()));
@@ -45,7 +45,7 @@ public class CommentControllerTest {
     }
 
     @Test
-    public void testGetCommentById() {
+     void testGetCommentById() {
         Comment comment = new Comment(1, 1, "Great post!", "User1", 0, new ArrayList<>());
         when(commentService.getCommentById(1)).thenReturn(new ResponseEntity<>(comment, HttpStatus.OK));
 
@@ -57,7 +57,7 @@ public class CommentControllerTest {
     }
 
     @Test
-    public void testGetCommentsByPostId() {
+     void testGetCommentsByPostId() {
         List<Comment> comments = new ArrayList<>();
         comments.add(new Comment(1, 1, "Great post!", "User1", 0, new ArrayList<>()));
         when(commentService.getCommentsByPostId(1)).thenReturn(new ResponseEntity<>(comments, HttpStatus.OK));
@@ -70,7 +70,7 @@ public class CommentControllerTest {
     }
 
     @Test
-    public void testCreateComment() {
+     void testCreateComment() {
         Comment comment = new Comment(1, 1, "Great post!", "User1", 0, new ArrayList<>());
         int postId = 1;
 
@@ -84,7 +84,7 @@ public class CommentControllerTest {
     }
 
     @Test
-    public void testUpdateComment() {
+     void testUpdateComment() {
         Comment updatedComment = new Comment(1, 1, "Updated comment!", "User1", 0, new ArrayList<>());
         when(commentService.updateComment(1, updatedComment)).thenReturn(new ResponseEntity<>(updatedComment, HttpStatus.OK));
 
@@ -96,17 +96,17 @@ public class CommentControllerTest {
     }
 
     @Test
-    public void testDeleteComment() {
-        when(commentService.deleteComment(1)).thenReturn(new ResponseEntity<>(HttpStatus.NO_CONTENT));
+    void testDeleteComment() {
+        int commentId = 1;
 
-        ResponseEntity<Void> response = commentController.deleteComment(1);
-
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        verify(commentService, times(1)).deleteComment(1);
+        when(commentService.deleteComment(commentId)).thenReturn(new ResponseEntity<>(HttpStatus.OK));
+        ResponseEntity<String> response = commentController.deleteComment(commentId);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(commentService, times(1)).deleteComment(commentId);
     }
 
     @Test
-    public void testDeleteCommentsByPostId() {
+     void testDeleteCommentsByPostId() {
         int postId = 1;
         ResponseEntity<String> response = commentController.deleteCommentsByPostId(postId);
         verify(commentService, times(1)).deleteByPostId(postId);

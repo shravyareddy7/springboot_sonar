@@ -7,7 +7,6 @@ public class Constants {
     public static final String GET_ALL_COMMENTS = "";
     public static final String GET_COMMENT_BY_ID = "/{id}";
     public static final String GET_COMMENTS_BY_POST_ID = "/post/{postId}";
-    public static final String CREATE_COMMENT = "";
     public static final String UPDATE_COMMENT = "/{id}";
     public static final String DELETE_COMMENT = "/{id}";
 

@@ -13,8 +13,12 @@ import java.util.List;
 @RequestMapping(Constants.COMMENTS_BASE_URL)
 public class CommentController {
 
-    @Autowired
     private CommentService commentService;
+
+    @Autowired
+    public CommentController(CommentService service){
+        commentService=service;
+    }
 
     @GetMapping(Constants.GET_ALL_COMMENTS)
     public ResponseEntity<List<Comment>> getAllComments() {
@@ -36,7 +40,7 @@ public class CommentController {
         commentService.deleteByPostId(postId);
         return ResponseEntity.ok("Deleted comment");
     }
-    @PostMapping(Constants.GET_COMMENTS_BY_POST_ID)
+    @PostMapping("/post/{postId}")
     public ResponseEntity<Comment> createComment(@RequestBody Comment comment,@PathVariable int postId) {
         return commentService.createComment(comment,postId);
     }
@@ -49,8 +53,9 @@ public class CommentController {
     }
 
     @DeleteMapping(Constants.DELETE_COMMENT)
-    public ResponseEntity<Void> deleteComment(@PathVariable int id) {
-        return commentService.deleteComment(id);
+    public ResponseEntity<String> deleteComment(@PathVariable int id) {
+        commentService.deleteComment(id);
+        return ResponseEntity.ok("Comment deleted with id "+id);
     }
 
 

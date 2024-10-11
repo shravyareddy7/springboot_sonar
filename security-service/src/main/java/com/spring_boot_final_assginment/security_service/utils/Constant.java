@@ -4,7 +4,7 @@ public class Constant {
     public static final String AUTH = "/auth";
     public static final String SUCCESSFUL_REGISTRATION="User registered successfully";
     public static final String REGISTER_URL ="/register";
-    public static final String TOKEN="/token";
+    public static final String LOGIN="/login";
     public static final String VALIDATE="/validate";
     public static final String INVALID_USER_CREDENTIALS = "Invalid User Credentials: Please check your username and password.";
     public static final String INVALID_TOKEN_MESSAGE = "Invalid Token";

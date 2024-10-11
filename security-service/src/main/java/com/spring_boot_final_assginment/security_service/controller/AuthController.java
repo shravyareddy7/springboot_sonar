@@ -30,7 +30,6 @@ public class AuthController {
 
     @PostMapping(Constant.REGISTER_URL)
     public String registerUser(@Valid @RequestBody UserDTO userDTO, BindingResult bindingResult) {
-        System.out.println("1");
         if (bindingResult.hasErrors()) {
             StringBuilder errorMessage = new StringBuilder(Constant.VALIDATION_ERRORS);
             bindingResult.getFieldErrors().forEach(error ->
@@ -41,9 +40,11 @@ public class AuthController {
         return authService.registerUser(userDTO);
     }
 
-    @PostMapping(Constant.TOKEN)
+    @PostMapping("/login")
     public String generateToken(@RequestBody UserDTO userDTO) {
+        System.out.println("login method");
         try {
+            System.out.println("try");
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(userDTO.getUsername(), userDTO.getPassword())
             );
@@ -53,11 +54,10 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/validate")
+    @PostMapping(Constant.VALIDATE)
     public String validateToken(@RequestParam("token") String token) {
         System.out.println(0);
         try {
-            System.out.println("validate 1");
             authService.validateToken(token);
             return "Valid User Token";
         } catch (Exception e) {
